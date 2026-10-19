@@ -112,6 +112,7 @@
         }
         .ai-msg {
             color: #1a1a1a;
+            white-space: pre-wrap;
         }
         .welcome {
             text-align: center;
@@ -214,8 +215,8 @@
     <div class="main">
         <div class="messages" id="messages">
             <div class="welcome">
-                <h2>Hi! I'm your simple AI chatbot</h2>
-                <p>Ask me for a joke, a fact, or about space!</p>
+                <h2>Hi! I'm your AI with a brain!</h2>
+                <p>I know about games, anime, coding, drawing, YouTubers, and more.<br>Ask me anything!</p>
             </div>
         </div>
         
@@ -233,19 +234,57 @@
     </div>
 
     <script>
+        let knowledgeBase = '';
+
+        // Load the knowledge base
+        fetch('ai_knowledge.txt')
+            .then(response => response.text())
+            .then(text => {
+                knowledgeBase = text;
+                console.log('AI brain loaded:', knowledgeBase.length, 'characters');
+            })
+            .catch(err => console.error('Could not load AI brain:', err));
+
+        function searchKnowledge(query) {
+            if (!knowledgeBase) return null;
+            const words = query.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+            if (words.length === 0) return null;
+
+            const lines = knowledgeBase.split('\n');
+            let bestMatch = '';
+            let bestScore = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].toLowerCase();
+                let score = 0;
+                for (const word of words) {
+                    if (line.includes(word)) score += 2;
+                }
+                if (score > bestScore && score >= 2) {
+                    bestScore = score;
+                    // Grab a few surrounding lines for context
+                    const start = Math.max(0, i - 2);
+                    const end = Math.min(lines.length, i + 5);
+                    bestMatch = lines.slice(start, end).join('\n').trim();
+                }
+            }
+            return bestScore >= 2 ? bestMatch : null;
+        }
+
         function simpleAI(input) {
-            input = input.toLowerCase().trim();
+            const lower = input.toLowerCase().trim();
             
-            if (['hello', 'hi', 'hey'].some(word => input.includes(word))) {
-                const greetings = [
-                    "Hi there! I'm your friendly AI buddy. What do you want to talk about?",
-                    "Hello! Ready for some fun AI chat?",
-                    "Hey! I'm an AI made just for you. Ask me anything cool!"
-                ];
-                return greetings[Math.floor(Math.random() * greetings.length)];
+            // First try knowledge base
+            const knowledge = searchKnowledge(lower);
+            if (knowledge) {
+                return "From my brain:\n\n" + knowledge;
+            }
+
+            if (['hello', 'hi', 'hey'].some(word => lower.includes(word))) {
+                return "Hi there! I'm your AI with a full brain of games, anime, coding, drawing, and more. What do you want to know?";
             }
             
-            if (input.includes('joke')) {
+            if (lower.includes('joke')) {
                 const jokes = [
                     "Why did the computer go to the doctor? Because it had a virus!",
                     "What do you call a computer that sings? A-Dell!",
@@ -254,28 +293,14 @@
                 return jokes[Math.floor(Math.random() * jokes.length)];
             }
             
-            if (input.includes('fact') || input.includes('tell me something')) {
-                const facts = [
-                    "Did you know that octopuses have three hearts?",
-                    "The longest word in the English dictionary is pneumonoultramicroscopicsilicovolcanoconiosis!",
-                    "Honey never spoils. Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3,000 years old and still edible!"
-                ];
-                return facts[Math.floor(Math.random() * facts.length)];
-            }
-            
-            if (input.includes('ai') || input.includes('what are you')) {
-                return "I'm a simple AI chatbot running in your browser! Real AIs learn from lots of data, but I'm a basic version that uses rules to chat with you. Pretty cool, right?";
-            }
-            
-            if (['space', 'planet', 'star'].some(word => input.includes(word))) {
-                return "Space is amazing! There are billions of stars in our galaxy. The closest star to Earth after the Sun is Proxima Centauri.";
+            if (lower.includes('what are you') || lower.includes('who are you')) {
+                return "I'm your custom AI chatbot with a brain full of information about games, anime, coding, drawing, YouTubers, and more! Ask me about Minecraft, Naruto, how to draw, or coding!";
             }
             
             const defaults = [
-                "That's interesting! Can you tell me more?",
-                "Hmm, I'm still learning. Try asking me for a joke or a fact!",
-                "Cool! What else would you like to know?",
-                "I'm a simple AI, so I do best with questions about jokes, facts, or space!"
+                "Hmm, I searched my brain but didn't find a strong match. Try asking about games, anime, coding, or drawing!",
+                "I'm still learning from the brain you gave me. Can you rephrase that?",
+                "Cool question! I know a lot about games, anime lists, coding basics, and how to draw. What would you like?"
             ];
             return defaults[Math.floor(Math.random() * defaults.length)];
         }
@@ -303,7 +328,7 @@
             setTimeout(() => {
                 const response = simpleAI(text);
                 addMessage(response, false);
-            }, 500);
+            }, 400);
         }
     </script>
 </body>
