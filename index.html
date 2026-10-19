@@ -87,7 +87,7 @@
         .messages {
             flex: 1;
             overflow-y: auto;
-            padding: 40px 15%;
+            padding: 40px 12%;
         }
         .message { margin: 16px 0; line-height: 1.5; }
         .user-msg { text-align: right; color: #1a1a1a; }
@@ -97,10 +97,21 @@
             background: #f8f9fa;
             padding: 12px 16px;
             border-radius: 12px;
-            max-width: 85%;
+            max-width: 90%;
+        }
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 8px 0;
+            white-space: pre;
         }
         .welcome { text-align: center; color: #666; margin-top: 15%; }
-        .input-area { padding: 16px 15%; background: white; }
+        .input-area { padding: 16px 12%; background: white; }
         .input-box {
             display: flex;
             align-items: center;
@@ -160,14 +171,14 @@
     <div class="main">
         <div class="messages" id="messages">
             <div class="welcome">
-                <h2>Hi! I'm your smarter AI</h2>
-                <p>I have a brain full of games, anime, coding, drawing, and more.<br>Ask me anything — I'll search and give better answers!</p>
+                <h2>Hi! I'm your coding AI</h2>
+                <p>I can write code, explain programming, and search my brain!<br>Try: "write a python function" or "make a simple html page"</p>
             </div>
         </div>
         <div class="input-area">
             <div class="input-box">
                 <button class="plus-btn" title="More options">+</button>
-                <input type="text" id="userInput" placeholder="Ask anything" onkeypress="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="userInput" placeholder="Ask anything (or ask me to code!)" onkeypress="if(event.key==='Enter') sendMessage()">
                 <div class="right-icons">
                     <button class="mode-btn">Fast ▾</button>
                     <button class="icon-btn" title="Voice">🎙</button>
@@ -179,91 +190,109 @@
 
     <script>
         let knowledgeBase = '';
-        const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','about','what','is','are','how','do','does','can','you','tell','me','please','give']);
+        const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','about','what','is','are','how','do','does','can','you','tell','me','please','give','write','make','create','code']);
 
         fetch('ai_knowledge.txt')
             .then(r => r.text())
-            .then(text => {
-                knowledgeBase = text;
-                console.log('Smarter AI brain loaded:', knowledgeBase.length, 'chars');
-            })
-            .catch(err => console.error('Brain load failed:', err));
+            .then(text => { knowledgeBase = text; })
+            .catch(err => console.error(err));
 
         function tokenize(text) {
-            return text.toLowerCase()
-                .replace(/[^a-z0-9\s]/g, ' ')
-                .split(/\s+/)
-                .filter(w => w.length > 2 && !stopWords.has(w));
+            return text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
         }
 
         function searchKnowledge(query) {
             if (!knowledgeBase) return null;
             const queryWords = tokenize(query);
             if (queryWords.length === 0) return null;
-
             const lines = knowledgeBase.split('\n');
             let best = { score: 0, text: '' };
-
             for (let i = 0; i < lines.length; i++) {
-                const line = lines[i];
-                const lineLower = line.toLowerCase();
+                const lineLower = lines[i].toLowerCase();
                 let score = 0;
-
-                // Exact phrase bonus
                 if (lineLower.includes(query.toLowerCase())) score += 10;
-
-                // Word matching with position bonus (titles/early lines better)
                 for (const word of queryWords) {
-                    if (lineLower.includes(word)) {
-                        score += 3;
-                        if (i < 50) score += 1; // prefer early content
-                    }
+                    if (lineLower.includes(word)) score += 3;
                 }
-
                 if (score > best.score && score >= 4) {
                     const start = Math.max(0, i - 1);
                     const end = Math.min(lines.length, i + 8);
-                    let context = lines.slice(start, end).join('\n').trim();
-                    // Clean up
-                    context = context.replace(/={3,}/g, '').replace(/\n{3,}/g, '\n\n');
+                    let context = lines.slice(start, end).join('\n').trim().replace(/={3,}/g, '');
                     best = { score, text: context };
                 }
             }
             return best.score >= 4 ? best.text : null;
         }
 
+        function generateCode(input) {
+            const lower = input.toLowerCase();
+
+            // Python examples
+            if (lower.includes('python')) {
+                if (lower.includes('hello') || lower.includes('world')) {
+                    return '```python\nprint("Hello, World!")\n```\n\nThis is the classic first Python program.';
+                }
+                if (lower.includes('function') || lower.includes('def')) {
+                    return '```python\ndef greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Friend"))\n```\n\nA simple function that greets someone.';
+                }
+                if (lower.includes('loop') || lower.includes('for')) {
+                    return '```python\nfor i in range(5):\n    print(f"Number: {i}")\n```\n\nA basic for loop in Python.';
+                }
+                return '```python\n# Simple Python example\nname = input("What is your name? ")\nprint(f"Nice to meet you, {name}!")\n```\n\nA small interactive Python script.';
+            }
+
+            // JavaScript
+            if (lower.includes('javascript') || lower.includes('js')) {
+                if (lower.includes('function')) {
+                    return '```javascript\nfunction greet(name) {\n    return `Hello, ${name}!`;\n}\nconsole.log(greet("Friend"));\n```';
+                }
+                return '```javascript\nconsole.log("Hello from JavaScript!");\n\n// Change the page title\ndocument.title = "My Cool Page";\n```';
+            }
+
+            // HTML
+            if (lower.includes('html') || lower.includes('webpage') || lower.includes('page')) {
+                return '```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello World!</h1>\n    <p>This is a simple webpage.</p>\n</body>\n</html>\n```\n\nSave this as index.html and open it in a browser.';
+            }
+
+            // Simple game
+            if (lower.includes('game') || lower.includes('guess')) {
+                return '```python\nimport random\n\nnumber = random.randint(1, 10)\nguess = int(input("Guess a number between 1 and 10: "))\n\nif guess == number:\n    print("You got it!")\nelse:\n    print(f"Nope! The number was {number}")\n```\n\nA tiny number guessing game.';
+            }
+
+            // Default coding help
+            return 'I can write code! Try asking:\n- "write a python hello world"\n- "make a javascript function"\n- "create a simple html page"\n- "python number guessing game"';
+        }
+
         function smartAI(input) {
             const lower = input.toLowerCase().trim();
 
-            // Knowledge search first
+            // Coding requests
+            if (/\b(code|write|make|create|program|script|function)\b/.test(lower) && 
+                /\b(python|javascript|js|html|code|program|game|function|loop)\b/.test(lower)) {
+                return generateCode(input);
+            }
+
+            // Knowledge search
             const knowledge = searchKnowledge(input);
             if (knowledge) {
-                let intro = "Here's what I found in my brain:\n\n";
-                if (lower.includes('how') || lower.includes('what is') || lower.includes('tell me')) {
-                    intro = "Based on the information I have:\n\n";
-                }
-                return intro + knowledge;
+                return "From my brain:\n\n" + knowledge;
             }
 
-            // Smarter built-in responses
-            if (/\b(hello|hi|hey|yo)\b/.test(lower)) {
-                return "Hey! I'm your smarter AI now. I can dig through my knowledge of games, anime, coding lessons, drawing guides, and more. What are you curious about?";
+            if (/\b(hello|hi|hey)\b/.test(lower)) {
+                return "Hey! I can chat, search my brain, and now I can write code too. Try asking me to write a Python function or make an HTML page!";
             }
             if (lower.includes('joke')) {
-                return ["Why don't programmers like nature? It has too many bugs!", "Why did the AI go to school? To improve its neural network!", "What do you call a lazy kangaroo? A pouch potato!"][Math.floor(Math.random()*3)];
+                return ["Why do programmers prefer dark mode? Because light attracts bugs!", "How many programmers does it take to change a light bulb? None, that's a hardware problem."][Math.floor(Math.random()*2)];
             }
-            if (/\b(who are you|what are you|your name)\b/.test(lower)) {
-                return "I'm your custom AI assistant! I was built with a special brain full of info on video games, anime lists, coding fundamentals, how to draw, popular creators, and more. Ask me specific questions and I'll search it for you.";
+            if (/\b(who are you|what are you)\b/.test(lower)) {
+                return "I'm your AI assistant with a brain + coding skills! I know about games, anime, drawing, and I can generate code in Python, JavaScript, and HTML.";
             }
-            if (lower.includes('thank')) return "You're welcome! Happy to help. Ask me anything else!";
 
-            // Topic hints
-            if (/\b(game|minecraft|roblox|console)\b/.test(lower)) return "I have a games database! Try asking about a specific game like 'Minecraft' or 'what games are there?'";
-            if (/\b(anime|naruto|bleach)\b/.test(lower)) return "I know lots of anime! Ask about a title like 'Naruto' or 'list some anime'.";
-            if (/\b(code|coding|programming|python|javascript)\b/.test(lower)) return "I have coding lessons! Try 'what are programming fundamentals' or 'how to start coding'.";
-            if (/\b(draw|drawing|sketch)\b/.test(lower)) return "I have a drawing guide! Ask 'how to start drawing' or 'drawing basics'.";
+            if (/\b(code|coding|programming)\b/.test(lower)) {
+                return "I can help with code! Ask me to write something specific, like:\n- Python hello world\n- A JavaScript function\n- A simple HTML page\n- A number guessing game";
+            }
 
-            return "I searched my brain but didn't find a strong match for that. Try being more specific — for example: 'Minecraft info', 'how to draw', 'Naruto', or 'coding basics'.";
+            return "I searched my brain but didn't find a strong match. You can also ask me to write code! Try 'write a python function' or 'make an html page'.";
         }
 
         function addMessage(text, isUser) {
@@ -272,7 +301,13 @@
             if (welcome) welcome.remove();
             const div = document.createElement('div');
             div.className = 'message ' + (isUser ? 'user-msg' : 'ai-msg');
-            div.textContent = text;
+            
+            // Render code blocks nicely
+            if (!isUser && text.includes('```')) {
+                div.innerHTML = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<div class="code-block">$2</div>').replace(/\n/g, '<br>');
+            } else {
+                div.textContent = text;
+            }
             messages.appendChild(div);
             messages.scrollTop = messages.scrollHeight;
         }
@@ -286,7 +321,7 @@
             setTimeout(() => {
                 const response = smartAI(text);
                 addMessage(response, false);
-            }, 350);
+            }, 300);
         }
     </script>
 </body>
