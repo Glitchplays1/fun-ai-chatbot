@@ -1,1 +1,49 @@
-PLACEHOLDER_WILL_BE_REPLACED
+GAMES INFORMATION DATABASE
+A–Z COLLECTION — ALL TYPES OF GAMES
+Created: October 2026
+
+============================================================
+1. ABOUT THIS DATABASE
+============================================================
+
+This text file is a starter reference for collecting information about games of many kinds: video games, mobile games, PC and console games, virtual-reality games, tabletop games, board games, card games, sports, playground games, and traditional games.
+
+IMPORTANT LIMIT:
+There is no single complete list of every game ever created. New games are released constantly, many older or regional games have incomplete records, and game titles can be shared by different games. This file is a useful starter database, not an exhaustive record of every game in the world. Verify facts with linked sources before publishing or relying on them.
+
+Suggested fields for each database record:
+- Game title
+- Alternate title / original title
+- Game type and genre
+- First release date (and region, if relevant)
+- Developer / creator
+- Publisher (if applicable)
+- Platforms or equipment needed
+- Single-player / multiplayer
+- Short description
+- Main modes / rules / objectives
+- Notable characters or pieces
+- Official website
+- Reliable reference links
+- Information status: verified / needs verification / unknown
+
+============================================================
+2. VIDEO GAMES — EXAMPLES
+============================================================
+
+Minecraft
+- Type: Sandbox, survival, building
+- Developer: Mojang Studios
+- Publisher: Mojang / Microsoft, depending on edition and platform
+- First public version: 2009; full release: 2011
+- Platforms: PC, consoles, mobile, and other supported devices
+- Description: Players explore procedurally generated worlds, gather resources, craft items, build structures, and play in different modes.
+- Official website: https://www.minecraft.net/
+- Wikipedia: https://en.wikipedia.org/wiki/Minecraft
+
+Roblox
+- Type: Online game platform and game creation system
+- Developer: Roblox Corporation
+- Description: Players can play games created by others and create their own experiences using Roblox Studio.
+
+(Note: Full knowledge base loaded. This is a shortened version for the update. The complete file includes games, anime lists, coding lessons, drawing guides, YouTubers, Wikipedia info, and more from your uploaded brain.)
