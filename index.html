@@ -3,21 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fun AI Chatbot</title>
+    <title>Grok-style AI</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
             height: 100vh;
             overflow: hidden;
             display: flex;
+            color: #1a1a1a;
         }
         .sidebar {
             width: 260px;
             background: #fafafa;
             border-right: 1px solid #e5e5e5;
-            padding: 16px 0;
+            padding: 12px 0;
             display: flex;
             flex-direction: column;
             height: 100vh;
@@ -25,19 +26,19 @@
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 10px 20px;
+            padding: 10px 16px;
             color: #333;
-            text-decoration: none;
             font-size: 14px;
             cursor: pointer;
-            gap: 12px;
+            gap: 10px;
+            border-radius: 8px;
+            margin: 2px 8px;
         }
-        .nav-item:hover, .nav-item.active { background: #f0f0f0; }
+        .nav-item:hover { background: #f0f0f0; }
         .nav-item.active { background: #e8e8e8; font-weight: 500; }
         .nav-section {
-            margin-top: 20px;
-            padding: 8px 20px;
-            font-size: 12px;
+            margin: 16px 16px 6px;
+            font-size: 11px;
             color: #888;
             font-weight: 600;
             text-transform: uppercase;
@@ -58,11 +59,11 @@
         .chat-item:hover { background: #f0f0f0; }
         .chat-item.active { background: #e8e8e8; }
         .user-section {
-            padding: 16px 20px;
+            padding: 12px 16px;
             border-top: 1px solid #e5e5e5;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-size: 14px;
         }
         .avatar {
@@ -75,7 +76,7 @@
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 13px;
         }
         .main {
             flex: 1;
@@ -87,45 +88,53 @@
         .messages {
             flex: 1;
             overflow-y: auto;
-            padding: 40px 12%;
+            padding: 40px 18% 20px;
         }
-        .message { margin: 16px 0; line-height: 1.5; }
-        .user-msg { text-align: right; color: #1a1a1a; }
+        .message { margin: 20px 0; line-height: 1.6; font-size: 15px; }
+        .user-msg {
+            text-align: right;
+            color: #1a1a1a;
+        }
         .ai-msg {
             color: #1a1a1a;
             white-space: pre-wrap;
-            background: #f8f9fa;
-            padding: 12px 16px;
-            border-radius: 12px;
-            max-width: 90%;
         }
         .code-block {
             background: #1e1e1e;
             color: #d4d4d4;
-            padding: 12px;
+            padding: 14px;
             border-radius: 8px;
-            font-family: 'Courier New', monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
             font-size: 13px;
             overflow-x: auto;
-            margin: 8px 0;
+            margin: 10px 0;
             white-space: pre;
         }
-        .welcome { text-align: center; color: #666; margin-top: 15%; }
-        .input-area { padding: 16px 12%; background: white; }
+        .welcome {
+            text-align: center;
+            color: #666;
+            margin-top: 18%;
+        }
+        .welcome h2 { font-weight: 600; margin-bottom: 8px; color: #1a1a1a; }
+        .input-area {
+            padding: 12px 18% 20px;
+            background: white;
+        }
         .input-box {
             display: flex;
             align-items: center;
             background: #f8f9fa;
             border: 1px solid #e0e0e0;
-            border-radius: 28px;
-            padding: 8px 16px;
-            gap: 8px;
-            max-width: 800px;
+            border-radius: 24px;
+            padding: 6px 12px;
+            gap: 6px;
+            max-width: 720px;
             margin: 0 auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .input-box:focus-within {
             border-color: #1a73e8;
-            box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.12);
         }
         .plus-btn {
             width: 32px; height: 32px; border-radius: 50%; border: none;
@@ -135,14 +144,14 @@
         .plus-btn:hover { background: #eee; }
         #userInput {
             flex: 1; border: none; outline: none; background: transparent;
-            font-size: 16px; padding: 6px 4px; color: #202124;
+            font-size: 15px; padding: 8px 4px; color: #202124;
         }
         #userInput::placeholder { color: #9aa0a6; }
         .right-icons { display: flex; align-items: center; gap: 2px; }
         .mode-btn, .icon-btn {
-            border: none; background: transparent; padding: 6px 10px;
+            border: none; background: transparent; padding: 6px 8px;
             border-radius: 16px; cursor: pointer; color: #5f6368;
-            font-size: 14px; display: flex; align-items: center; gap: 4px;
+            font-size: 13px; display: flex; align-items: center; gap: 3px;
         }
         .mode-btn:hover, .icon-btn:hover { background: #eee; }
     </style>
@@ -171,14 +180,14 @@
     <div class="main">
         <div class="messages" id="messages">
             <div class="welcome">
-                <h2>Hi! I'm your coding AI</h2>
-                <p>I can write code, explain programming, and search my brain!<br>Try: "write a python function" or "make a simple html page"</p>
+                <h2>How can I help you today?</h2>
+                <p>I can search my knowledge, write code, and chat. Just ask.</p>
             </div>
         </div>
         <div class="input-area">
             <div class="input-box">
                 <button class="plus-btn" title="More options">+</button>
-                <input type="text" id="userInput" placeholder="Ask anything (or ask me to code!)" onkeypress="if(event.key==='Enter') sendMessage()">
+                <input type="text" id="userInput" placeholder="Ask anything" onkeypress="if(event.key==='Enter') sendMessage()">
                 <div class="right-icons">
                     <button class="mode-btn">Fast ▾</button>
                     <button class="icon-btn" title="Voice">🎙</button>
@@ -190,12 +199,12 @@
 
     <script>
         let knowledgeBase = '';
-        const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','about','what','is','are','how','do','does','can','you','tell','me','please','give','write','make','create','code']);
+        const stopWords = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','about','what','is','are','how','do','does','can','you','tell','me','please','give','write','make','create']);
 
         fetch('ai_knowledge.txt')
             .then(r => r.text())
             .then(text => { knowledgeBase = text; })
-            .catch(err => console.error(err));
+            .catch(() => {});
 
         function tokenize(text) {
             return text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length > 2 && !stopWords.has(w));
@@ -210,89 +219,69 @@
             for (let i = 0; i < lines.length; i++) {
                 const lineLower = lines[i].toLowerCase();
                 let score = 0;
-                if (lineLower.includes(query.toLowerCase())) score += 10;
+                if (lineLower.includes(query.toLowerCase())) score += 12;
                 for (const word of queryWords) {
                     if (lineLower.includes(word)) score += 3;
                 }
-                if (score > best.score && score >= 4) {
+                if (score > best.score && score >= 5) {
                     const start = Math.max(0, i - 1);
-                    const end = Math.min(lines.length, i + 8);
-                    let context = lines.slice(start, end).join('\n').trim().replace(/={3,}/g, '');
+                    const end = Math.min(lines.length, i + 7);
+                    let context = lines.slice(start, end).join('\n').trim().replace(/={3,}/g, '').replace(/\n{3,}/g, '\n\n');
                     best = { score, text: context };
                 }
             }
-            return best.score >= 4 ? best.text : null;
+            return best.score >= 5 ? best.text : null;
         }
 
         function generateCode(input) {
             const lower = input.toLowerCase();
-
-            // Python examples
             if (lower.includes('python')) {
-                if (lower.includes('hello') || lower.includes('world')) {
-                    return '```python\nprint("Hello, World!")\n```\n\nThis is the classic first Python program.';
-                }
-                if (lower.includes('function') || lower.includes('def')) {
-                    return '```python\ndef greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("Friend"))\n```\n\nA simple function that greets someone.';
-                }
-                if (lower.includes('loop') || lower.includes('for')) {
-                    return '```python\nfor i in range(5):\n    print(f"Number: {i}")\n```\n\nA basic for loop in Python.';
-                }
-                return '```python\n# Simple Python example\nname = input("What is your name? ")\nprint(f"Nice to meet you, {name}!")\n```\n\nA small interactive Python script.';
+                if (lower.includes('hello')) return '```python\nprint("Hello, World!")\n```\n\nClassic first program.';
+                if (lower.includes('function')) return '```python\ndef greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("there"))\n```';
+                if (lower.includes('guess') || lower.includes('game')) return '```python\nimport random\nnumber = random.randint(1, 10)\nguess = int(input("Guess 1-10: "))\nprint("Correct!" if guess == number else f"It was {number}")\n```';
+                return '```python\nname = input("Name: ")\nprint(f"Hello, {name}!")\n```';
             }
-
-            // JavaScript
             if (lower.includes('javascript') || lower.includes('js')) {
-                if (lower.includes('function')) {
-                    return '```javascript\nfunction greet(name) {\n    return `Hello, ${name}!`;\n}\nconsole.log(greet("Friend"));\n```';
-                }
-                return '```javascript\nconsole.log("Hello from JavaScript!");\n\n// Change the page title\ndocument.title = "My Cool Page";\n```';
+                return '```javascript\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\nconsole.log(greet("World"));\n```';
             }
-
-            // HTML
-            if (lower.includes('html') || lower.includes('webpage') || lower.includes('page')) {
-                return '```html\n<!DOCTYPE html>\n<html>\n<head>\n    <title>My Page</title>\n</head>\n<body>\n    <h1>Hello World!</h1>\n    <p>This is a simple webpage.</p>\n</body>\n</html>\n```\n\nSave this as index.html and open it in a browser.';
+            if (lower.includes('html')) {
+                return '```html\n<!DOCTYPE html>\n<html>\n<head><title>Page</title></head>\n<body>\n  <h1>Hello</h1>\n  <p>Simple page.</p>\n</body>\n</html>\n```';
             }
-
-            // Simple game
-            if (lower.includes('game') || lower.includes('guess')) {
-                return '```python\nimport random\n\nnumber = random.randint(1, 10)\nguess = int(input("Guess a number between 1 and 10: "))\n\nif guess == number:\n    print("You got it!")\nelse:\n    print(f"Nope! The number was {number}")\n```\n\nA tiny number guessing game.';
-            }
-
-            // Default coding help
-            return 'I can write code! Try asking:\n- "write a python hello world"\n- "make a javascript function"\n- "create a simple html page"\n- "python number guessing game"';
+            return 'I can generate code. Try:\n- write a python hello world\n- make a javascript function\n- create a simple html page';
         }
 
-        function smartAI(input) {
+        function grokAI(input) {
             const lower = input.toLowerCase().trim();
 
-            // Coding requests
-            if (/\b(code|write|make|create|program|script|function)\b/.test(lower) && 
-                /\b(python|javascript|js|html|code|program|game|function|loop)\b/.test(lower)) {
+            // Code requests
+            if (/\b(code|write|make|create|program|function|script)\b/.test(lower) && 
+                /\b(python|javascript|js|html|code|program|game)\b/.test(lower)) {
                 return generateCode(input);
             }
 
-            // Knowledge search
+            // Knowledge
             const knowledge = searchKnowledge(input);
             if (knowledge) {
-                return "From my brain:\n\n" + knowledge;
+                return knowledge;
             }
 
-            if (/\b(hello|hi|hey)\b/.test(lower)) {
-                return "Hey! I can chat, search my brain, and now I can write code too. Try asking me to write a Python function or make an HTML page!";
+            if (/\b(hello|hi|hey|yo)\b/.test(lower)) {
+                return "Hey. What do you need?";
             }
             if (lower.includes('joke')) {
-                return ["Why do programmers prefer dark mode? Because light attracts bugs!", "How many programmers does it take to change a light bulb? None, that's a hardware problem."][Math.floor(Math.random()*2)];
+                return ["Why do programmers prefer dark mode? Light attracts bugs.", "There are 10 kinds of people: those who understand binary and those who don't."][Math.floor(Math.random()*2)];
             }
-            if (/\b(who are you|what are you)\b/.test(lower)) {
-                return "I'm your AI assistant with a brain + coding skills! I know about games, anime, drawing, and I can generate code in Python, JavaScript, and HTML.";
+            if (/\b(who are you|what are you|your name)\b/.test(lower)) {
+                return "I'm an AI assistant with knowledge about games, anime, coding, and drawing. I can also write simple code. Ask me something specific.";
             }
+            if (lower.includes('thank')) return "No problem.";
 
-            if (/\b(code|coding|programming)\b/.test(lower)) {
-                return "I can help with code! Ask me to write something specific, like:\n- Python hello world\n- A JavaScript function\n- A simple HTML page\n- A number guessing game";
-            }
+            if (/\b(game|minecraft|roblox)\b/.test(lower)) return "I have game info in my knowledge base. Ask about a specific title like Minecraft or Roblox.";
+            if (/\b(anime|naruto)\b/.test(lower)) return "I know various anime. Try asking about a specific one like Naruto.";
+            if (/\b(draw|drawing)\b/.test(lower)) return "I have drawing basics. Ask how to start drawing or about core principles.";
+            if (/\b(code|coding|programming)\b/.test(lower)) return "I can write code. Try asking me to write a Python function, JavaScript example, or simple HTML page.";
 
-            return "I searched my brain but didn't find a strong match. You can also ask me to write code! Try 'write a python function' or 'make an html page'.";
+            return "I don't have a strong match for that in my knowledge. Try being more specific, or ask me to write some code.";
         }
 
         function addMessage(text, isUser) {
@@ -301,8 +290,6 @@
             if (welcome) welcome.remove();
             const div = document.createElement('div');
             div.className = 'message ' + (isUser ? 'user-msg' : 'ai-msg');
-            
-            // Render code blocks nicely
             if (!isUser && text.includes('```')) {
                 div.innerHTML = text.replace(/```(\w+)?\n([\s\S]*?)```/g, '<div class="code-block">$2</div>').replace(/\n/g, '<br>');
             } else {
@@ -318,10 +305,7 @@
             if (!text) return;
             addMessage(text, true);
             input.value = '';
-            setTimeout(() => {
-                const response = smartAI(text);
-                addMessage(response, false);
-            }, 300);
+            setTimeout(() => addMessage(grokAI(text), false), 250);
         }
     </script>
 </body>
